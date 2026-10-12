@@ -25,10 +25,13 @@ class CaneSection:
     male_radius: float = 5.4
     """The radius of the male joint."""
 
+    male_fillet: float | None = None
+    """Whether to fillet the join between the main section and the male join or not."""
+
     female_radius: float = 5.5
     """The radius of the female joint."""
 
-    interior_radius: float = 4
+    interior_radius: float = 2.5
     """The radius of the interior shaft."""
 
     @property
@@ -43,7 +46,7 @@ class CaneSection:
         This join must be translated to be above the main section.
         """
         difference = self.section_radius - self.male_radius
-        return (
+        join = (
             cq.Workplane("XY")
             .cylinder(self.join_length, self.male_radius, centered=(True, True, False))
             .union(
@@ -54,6 +57,12 @@ class CaneSection:
                 .loft()
             )
         )
+        male_fillet = self.male_fillet
+        if male_fillet is not None:
+            join = join.edges(
+                cq.selectors.NearestToPointSelector((0, 0, difference))
+            ).fillet(male_fillet)
+        return join
 
     @property
     def section(self) -> cq.Workplane:
@@ -99,6 +108,6 @@ class CaneSection:
 
 
 if __name__ == "__main__":
-    section = CaneSection()
+    section = CaneSection(section_length=60)
     model = section.get_shape()
     cq.exporters.export(model, "cane_section.stl")
