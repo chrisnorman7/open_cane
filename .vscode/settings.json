@@ -3,6 +3,7 @@
     "cadquery",
     "centered",
     "cq",
+    "stl",
     "Workplane",
     "XY"
   ]
