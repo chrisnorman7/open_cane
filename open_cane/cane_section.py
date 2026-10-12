@@ -8,12 +8,12 @@ class CaneSection:
     """A section of a cane."""
 
     section_length: float = 210
-    """The length of the section, minus `joint_length`."""
+    """The length of the section, minus `join_length`."""
 
     section_radius: float = 7
     """The radius of the main section."""
 
-    waist_length: float = 20
+    waist_length: float = 15
     """The length of the outer waist."""
 
     waist_radius: float = 8
@@ -22,13 +22,13 @@ class CaneSection:
     join_length: float = 40
     """The length of each join."""
 
-    male_radius: float = 6
+    male_radius: float = 5
     """The radius of the male joint."""
 
-    female_radius: float = 6.5
+    female_radius: float = 5.5
     """The radius of the female joint."""
 
-    interior_radius: float = 5
+    interior_radius: float = 4
     """The radius of the interior shaft."""
 
     @property
