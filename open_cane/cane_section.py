@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import cast
 
 import cadquery as cq
 
@@ -35,7 +34,7 @@ class CaneSection:
     @property
     def total_length(self) -> float:
         """The entire length of the section."""
-        return self.join_length + +self.section_length
+        return self.join_length + self.section_length
 
     @property
     def male_join(self) -> cq.Workplane:
@@ -44,7 +43,7 @@ class CaneSection:
         This join must be translated to be above the main section.
         """
         return cq.Workplane("XY").cylinder(
-            self.section_length, self.male_radius, centered=(True, True, False)
+            self.join_length, self.male_radius, centered=(True, True, False)
         )
 
     @property
@@ -81,10 +80,16 @@ class CaneSection:
             self.waist_length, self.waist_radius, centered=(True, True, False)
         )
 
-    def get_shape(self) -> cq.Shape:
+    def get_shape(self) -> cq.Workplane:
         """Get the section shape."""
         section = self.section.union(
             self.male_join.translate((0, 0, self.section_length))
         ).union(self.waist)
         section = section.cut(self.interior).cut(self.female_join)
-        return cast(cq.Shape, section.val())
+        return section
+
+
+if __name__ == "__main__":
+    section = CaneSection(section_length=60)
+    model = section.get_shape()
+    cq.exporters.export(model, "cane_section.stl")
