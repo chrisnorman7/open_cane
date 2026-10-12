@@ -22,7 +22,7 @@ class CaneSection:
     join_length: float = 40
     """The length of each join."""
 
-    male_radius: float = 5
+    male_radius: float = 5.4
     """The radius of the male joint."""
 
     female_radius: float = 5.5
@@ -42,8 +42,17 @@ class CaneSection:
 
         This join must be translated to be above the main section.
         """
-        return cq.Workplane("XY").cylinder(
-            self.join_length, self.male_radius, centered=(True, True, False)
+        difference = self.section_radius - self.male_radius
+        return (
+            cq.Workplane("XY")
+            .cylinder(self.join_length, self.male_radius, centered=(True, True, False))
+            .union(
+                cq.Workplane("XY")
+                .circle(self.section_radius)
+                .workplane(offset=difference)
+                .circle(self.male_radius)
+                .loft()
+            )
         )
 
     @property
