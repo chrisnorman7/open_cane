@@ -99,6 +99,6 @@ class CaneSection:
 
 
 if __name__ == "__main__":
-    section = CaneSection(section_length=60)
+    section = CaneSection()
     model = section.get_shape()
     cq.exporters.export(model, "cane_section.stl")
