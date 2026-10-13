@@ -43,18 +43,9 @@ class CaneSection:
         This join must be translated to be above the main section.
         """
         difference = self.section_radius - self.male_radius
-        join = (
-            cq.Workplane("XY")
-            .cylinder(self.join_length, self.male_radius, centered=(True, True, False))
-            .union(
-                cq.Workplane("XY")
-                .circle(self.section_radius)
-                .workplane(offset=difference)
-                .circle(self.male_radius)
-                .loft()
-            )
+        join = cq.Workplane("XY").cylinder(
+            self.join_length, self.male_radius, centered=(True, True, False)
         )
-        male_fillet = difference - 0.1
         cutter = (
             cq.Workplane("XY")
             .cylinder(
@@ -62,14 +53,16 @@ class CaneSection:
                 self.section_radius * 2,
                 centered=(True, True, False),
             )
+            .cut(cq.Workplane("XY").cylinder(self.section_length, self.male_radius))
             .edges("<Z")
-            .fillet(male_fillet)
-        ).cut(cq.Workplane("XY").cylinder(self.section_length, self.male_radius))
+            .fillet(difference)
+        )
         ring = (
             cq.Workplane("XY")
             .cylinder(difference, self.section_radius, centered=(True, True, False))
-            .union(cutter)
+            .cut(cutter)
         )
+        cq.exporters.export(ring, "ring.stl")
         join = join.union(ring)
         return join
 
