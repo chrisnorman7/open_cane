@@ -6,5 +6,11 @@
     "stl",
     "Workplane",
     "XY"
-  ]
+  ],
+  "chat.tools.terminal.autoApprove": {
+    "/^python -c \"import cadquery as cq; print\\(cq\\.__version__\\)\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
 }

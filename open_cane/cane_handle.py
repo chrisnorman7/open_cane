@@ -39,7 +39,7 @@ class CaneHandle:
         """Get the shape of the handle."""
         section = self.section
         height = section.section_length - section.waist_length
-        cross_section = section.section_radius + self.walls_thickness
+        cross_section = (self.walls_thickness + section.section_radius) * 2
         box = cq.Workplane("XY").box(
             cross_section,
             cross_section,
@@ -67,7 +67,7 @@ class CaneHandle:
                     self.top_thickness,
                     centered=(True, True, False),
                 )
-                .cut(cq.Workplane("XY").sphere(cross_section))
+                .cut(cq.Workplane("XY").sphere(cross_section / 2))
             ).union(
                 cq.Workplane("XY").cylinder(
                     self.top_thickness,
