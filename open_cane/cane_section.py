@@ -62,7 +62,6 @@ class CaneSection:
             .cylinder(difference, self.section_radius, centered=(True, True, False))
             .cut(cutter)
         )
-        cq.exporters.export(ring, "ring.stl")
         join = join.union(ring)
         return join
 
