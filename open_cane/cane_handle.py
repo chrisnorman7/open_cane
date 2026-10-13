@@ -53,30 +53,28 @@ class CaneHandle:
             .circle(section.section_radius - self.radius_overflow)
             .loft()
         )
+        box = box.cut(middle_cutter).edges("|Z and >X").fillet(section.section_radius)
         box = (
-            box.cut(middle_cutter)
-            .edges("|Z and >X and <Y")
-            .fillet(section.section_radius)
-        )
-        top_cutter = (
-            (
+            box.edges(">Z")
+            .fillet(cross_section / 2)
+            .cut(
                 cq.Workplane("XY")
-                .box(
-                    cross_section,
-                    cross_section,
-                    self.top_thickness,
-                    centered=(True, True, False),
-                )
-                .cut(cq.Workplane("XY").sphere(cross_section / 2))
-            ).union(
-                cq.Workplane("XY").cylinder(
+                .cylinder(
                     self.top_thickness,
                     section.interior_radius,
                     centered=(True, True, False),
                 )
+                .translate((0, 0, height))
             )
-        ).translate((0, 0, height))
-        return box.cut(top_cutter)
+        )
+        braille = self.braille
+        assert braille is not None
+        bounds = braille.BoundingBox()
+        if bounds.xlen < height or bounds.ylen < cross_section:
+            raise RuntimeError(
+                f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {cross_section})."
+            )
+        return box
 
 
 if __name__ == "__main__":

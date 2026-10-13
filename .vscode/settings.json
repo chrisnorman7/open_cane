@@ -5,7 +5,9 @@
     "cq",
     "stl",
     "Workplane",
-    "XY"
+    "xlen",
+    "XY",
+    "ylen"
   ],
   "chat.tools.terminal.autoApprove": {
     "/^python -c \"import cadquery as cq; print\\(cq\\.__version__\\)\"$/": {
