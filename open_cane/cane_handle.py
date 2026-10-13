@@ -15,7 +15,7 @@ class CaneHandle:
     The section settings are used to work out the length and radius of the handle.
     """
 
-    radius_overflow: float = 0.2
+    radius_overflow: float = 0.1
     """How much space should be left between the outside of the section and the handle."""
 
     top_thickness: float = 20
