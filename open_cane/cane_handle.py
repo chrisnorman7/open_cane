@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
 import cadquery as cq
+from braille import BrailleSettings
 from cane_section import CaneSection
-
-from open_cane.braille import BrailleSettings
 
 
 @dataclass(frozen=True)
@@ -78,3 +77,10 @@ class CaneHandle:
             )
         ).translate((0, 0, height))
         return box.cut(top_cutter)
+
+
+if __name__ == "__main__":
+    section = CaneSection(section_length=50)
+    handle = CaneHandle(section=section)
+    model = handle.get_shape()
+    cq.exporters.export(model, "handle.stl")
