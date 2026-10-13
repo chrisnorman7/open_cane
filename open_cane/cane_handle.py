@@ -56,29 +56,39 @@ class CaneHandle:
         box = box.cut(middle_cutter).edges("|Z and >X").fillet(section.section_radius)
         box = (
             box.edges(">Z")
-            .fillet(cross_section / 2)
+            .fillet(cross_section / 2 - 0.1)
             .cut(
                 cq.Workplane("XY")
                 .cylinder(
-                    self.top_thickness,
+                    self.top_thickness + 2,
                     section.interior_radius,
                     centered=(True, True, False),
                 )
-                .translate((0, 0, height))
+                .translate((0, 0, height - 1))
             )
         )
         braille = self.braille
-        assert braille is not None
-        bounds = braille.BoundingBox()
-        if bounds.xlen < height or bounds.ylen < cross_section:
-            raise RuntimeError(
-                f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {cross_section})."
+        if braille is not None:
+            bounds = braille.BoundingBox()
+            if bounds.xlen > height or bounds.ylen > cross_section:
+                raise RuntimeError(
+                    f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {cross_section})."
+                )
+            braille = braille.translate(
+                (
+                    -bounds.xmin - bounds.xlen / 2 - height / 2,
+                    -bounds.ymin - bounds.ylen / 2,
+                    -bounds.zmin + cross_section / 2 - 0.05,
+                )
+            )
+            box = (box.rotate((0, 0, 0), (0, 1, 0), 270).union(braille)).rotate(
+                (0, 0, 0), (0, 1, 0), 90
             )
         return box
 
 
 if __name__ == "__main__":
-    section = CaneSection(section_length=50)
+    section = CaneSection()
     handle = CaneHandle(section=section)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
