@@ -74,7 +74,7 @@ class CaneHandle:
                 raise RuntimeError(
                     f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {cross_section})."
                 )
-            braille = braille.translate(
+            braille = braille.rotate((0, 0, 0), (0, 0, 1), 180).translate(
                 (
                     -bounds.xmin - bounds.xlen / 2 - height / 2,
                     -bounds.ymin - bounds.ylen / 2,
