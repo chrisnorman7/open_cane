@@ -7,7 +7,9 @@ from braille import (
     is_braille_character,
     multiline_braille,
 )
+from cane_handle import CaneHandle
 from cane_section import CaneSection
+from cane_tip import CaneTip
 
 __all__ = [
     "CaneSection",
@@ -18,4 +20,6 @@ __all__ = [
     "is_allowed_braille_spacing",
     "BrailleLine",
     "multiline_braille",
+    "CaneHandle",
+    "CaneTip",
 ]
