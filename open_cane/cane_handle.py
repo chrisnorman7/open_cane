@@ -74,15 +74,33 @@ class CaneHandle:
                 raise RuntimeError(
                     f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {cross_section})."
                 )
-            braille = braille.rotate((0, 0, 0), (0, 0, 1), 180).translate(
+            center_x = (bounds.xmin + bounds.xmax) / 2
+            center_y = (bounds.ymin + bounds.ymax) / 2
+            braille = braille.rotate(
+                (center_x, center_y, 0),
+                (center_x, center_y, 1),
+                180,
+            )
+            braille = braille.translate(
                 (
-                    -bounds.xmin - bounds.xlen / 2 - height / 2,
-                    -bounds.ymin - bounds.ylen / 2,
-                    -bounds.zmin + cross_section / 2 - 0.05,
+                    height / 2 - center_x,
+                    -center_y,
+                    cross_section / 2 - 0.05 - bounds.zmin,
                 )
             )
-            box = (box.rotate((0, 0, 0), (0, 1, 0), 270).union(braille)).rotate(
-                (0, 0, 0), (0, 1, 0), 90
+            box = (box.rotate((0, 0, 0), (0, 1, 0), 90).union(braille)).rotate(
+                (0, 0, 0), (0, 1, 0), 270
+            )
+            braille_on_handle = braille.rotate((0, 0, 0), (0, 1, 0), 270)
+            b_bounds = braille_on_handle.BoundingBox()
+            print(f"Braille X (face at {-cross_section / 2:.2f}): {b_bounds.xmin:.2f} -> {b_bounds.xmax:.2f}")
+            print(
+                f"Braille Y (centered at 0.00): {b_bounds.ymin:.2f} -> {b_bounds.ymax:.2f} "
+                f"(center: {(b_bounds.ymin + b_bounds.ymax) / 2:.2f})"
+            )
+            print(
+                f"Braille Z (target center {height / 2:.2f}): {b_bounds.zmin:.2f} -> {b_bounds.zmax:.2f} "
+                f"(center: {(b_bounds.zmin + b_bounds.zmax) / 2:.2f})"
             )
         return box
 
