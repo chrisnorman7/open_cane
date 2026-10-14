@@ -47,27 +47,12 @@ class CaneHandle:
         cylinder = cq.Workplane("XY").cylinder(
             height, cross_section, centered=(True, True, False)
         )
-        middle = (
-            cq.Workplane("XY")
-            .cylinder(
-                height - self.top_thickness,
-                section.section_radius + self.radius_overflow,
-                centered=(True, True, False),
-            )
-            .union(
-                cq.Workplane("XY").cylinder(
-                    height, self.hole_radius, centered=(True, True, False)
-                )
-            )
-        ).union(
-            cq.Workplane("XY").sphere(section.interior_radius).translate((0, 0, height))
-        )
         box = cq.Workplane("XY").box(
             height, box_cross_section, box_cross_section, centered=False
         )
         box = box.rotate((0, 0, 0), (0, 1, 0), 270)
         cylinder = cylinder.union(box)
-        cylinder = cylinder.edges(">Z").fillet(cross_section - 0.01)
+        cylinder = cylinder.edges(">Z").fillet(self.walls_thickness)
         braille = self.braille
         if braille is not None:
             bounds = braille.BoundingBox()
@@ -85,6 +70,21 @@ class CaneHandle:
                 )
             ).rotate((0, 0, 0), (0, 1, 0), 270)
             cylinder = cylinder.union(braille)
+        middle = (
+            cq.Workplane("XY")
+            .cylinder(
+                height - self.top_thickness,
+                section.section_radius + self.radius_overflow,
+                centered=(True, True, False),
+            )
+            .union(
+                cq.Workplane("XY").cylinder(
+                    height, self.hole_radius, centered=(True, True, False)
+                )
+            )
+        ).union(
+            cq.Workplane("XY").sphere(section.interior_radius).translate((0, 0, height))
+        )
         return cylinder.cut(middle)
 
 
