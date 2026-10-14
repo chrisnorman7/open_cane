@@ -53,7 +53,8 @@ class CaneHandle:
         )
         box = box.rotate((0, 0, 0), (0, 1, 0), 270)
         cylinder = cylinder.union(box)
-        cylinder = cylinder.edges(">Z").fillet(cross_section)
+        # An exact-radius fillet degenerates at the top face.
+        cylinder = cylinder.edges(">Z").fillet(cross_section * 0.999)
         braille = self.braille
         if braille is not None:
             bounds = braille.BoundingBox()
@@ -63,14 +64,16 @@ class CaneHandle:
                 )
             center_x = (bounds.xmin + bounds.xmax) / 2
             center_y = (bounds.ymin + bounds.ymax) / 2
+            braille = braille.rotate((0, 0, 0), (0, 1, 0), 270)
+            rotated_bounds = braille.BoundingBox()
             braille = braille.translate(
                 (
+                    -cross_section - rotated_bounds.xmax,
+                    -center_y,
                     height / 2 - center_x,
-                    (cross_section / 2) - center_y,
-                    cross_section + bounds.zmin,
                 )
-            ).rotate((0, 0, 0), (0, 1, 0), 270)
-            # cylinder = cylinder.union(braille)
+            )
+            cylinder = cylinder.union(braille)
             shape = cast(cq.Shape, cylinder.val())
             box = shape.BoundingBox()
             print(box.xmin)
@@ -93,7 +96,7 @@ class CaneHandle:
 
 
 if __name__ == "__main__":
-    section = CaneSection(section_length=100)
+    section = CaneSection(section_length=70)
     handle = CaneHandle(section=section)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
