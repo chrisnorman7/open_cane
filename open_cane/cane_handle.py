@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import cadquery as cq
-from braille import BrailleSettings
+from braille import BrailleLine
 from cane_section import CaneSection
 
 
@@ -36,37 +36,37 @@ class CaneHandle:
         text = self.braille_text
         if text is None:
             return None
-        return BrailleSettings.standard.braille_line(dots=8, line=text)
+        return BrailleLine(line=text).get_shape()
 
     def get_shape(self) -> cq.Workplane:
         """Get the shape of the handle."""
         section = self.section
         height = section.section_length - section.waist_length + self.top_thickness
         cross_section = self.walls_thickness + section.section_radius
-        box_cross_section = cross_section * 2
+        box_y = cross_section * 2
         cylinder = cq.Workplane("XY").cylinder(
             height, cross_section, centered=(True, True, False)
         )
         box = cq.Workplane("XY").box(
-            height, box_cross_section, box_cross_section, centered=False
+            height, box_y, cross_section, centered=(False, True, False)
         )
         box = box.rotate((0, 0, 0), (0, 1, 0), 270)
         cylinder = cylinder.union(box)
-        cylinder = cylinder.edges(">Z").fillet(self.walls_thickness)
+        cylinder = cylinder.edges(">Z").fillet(cross_section)
         braille = self.braille
         if braille is not None:
             bounds = braille.BoundingBox()
-            if bounds.xlen > height or bounds.ylen > box_cross_section:
+            if bounds.xlen > height or bounds.ylen > box_y:
                 raise RuntimeError(
-                    f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {box_cross_section})."
+                    f"Braille text ({bounds.xlen} x {bounds.ylen}) does not fit on the handle ({height} x {box_y})."
                 )
             center_x = (bounds.xmin + bounds.xmax) / 2
             center_y = (bounds.ymin + bounds.ymax) / 2
             braille = braille.translate(
                 (
                     height / 2 - center_x,
-                    cross_section - center_y,
-                    box_cross_section - bounds.zmin,
+                    (cross_section / 2) - center_y,
+                    cross_section - bounds.zmin,
                 )
             ).rotate((0, 0, 0), (0, 1, 0), 270)
             cylinder = cylinder.union(braille)
@@ -89,7 +89,7 @@ class CaneHandle:
 
 
 if __name__ == "__main__":
-    section = CaneSection()
+    section = CaneSection(section_length=100)
     handle = CaneHandle(section=section)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
