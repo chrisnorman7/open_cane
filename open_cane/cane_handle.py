@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import cast
 
 import cadquery as cq
 from braille import BrailleLine
@@ -66,10 +67,13 @@ class CaneHandle:
                 (
                     height / 2 - center_x,
                     (cross_section / 2) - center_y,
-                    cross_section - bounds.zmin,
+                    cross_section + bounds.zmin,
                 )
             ).rotate((0, 0, 0), (0, 1, 0), 270)
-            cylinder = cylinder.union(braille)
+            # cylinder = cylinder.union(braille)
+            shape = cast(cq.Shape, cylinder.val())
+            box = shape.BoundingBox()
+            print(box.xmin)
         middle = (
             cq.Workplane("XY")
             .cylinder(
