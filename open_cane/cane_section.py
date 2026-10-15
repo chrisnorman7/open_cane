@@ -10,7 +10,7 @@ class CaneSection:
     section_length: float = 210
     """The length of the section, minus `join_length`."""
 
-    section_radius: float = 7
+    section_radius: float = 6.5
     """The radius of the main section."""
 
     waist_length: float = 15
