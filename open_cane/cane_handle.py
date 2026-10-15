@@ -89,8 +89,6 @@ class CaneHandle:
                     height, self.hole_radius, centered=(True, True, False)
                 )
             )
-        ).union(
-            cq.Workplane("XY").sphere(section.interior_radius).translate((0, 0, height))
         )
         return cylinder.cut(middle)
 
