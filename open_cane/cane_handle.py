@@ -16,7 +16,7 @@ class CaneHandle:
     The section settings are used to work out the length and radius of the handle.
     """
 
-    radius_overflow: float = 0.1
+    radius_overflow: float = 0.3
     """How much space should be left between the outside of the section and the handle."""
 
     top_thickness: float = 20
@@ -96,7 +96,7 @@ class CaneHandle:
 
 
 if __name__ == "__main__":
-    section = CaneSection(section_length=70)
+    section = CaneSection()
     handle = CaneHandle(section=section)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
