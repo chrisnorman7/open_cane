@@ -10,13 +10,13 @@ class CaneSection:
     section_length: float = 210
     """The length of the section, minus `join_length`."""
 
-    section_radius: float = 7
+    section_radius: float = 8
     """The radius of the main section."""
 
     waist_length: float = 15
     """The length of the outer waist."""
 
-    waist_radius: float = 8
+    waist_radius: float = 9
     """The radius of the flared part of the female join."""
 
     join_length: float = 40
@@ -28,10 +28,10 @@ class CaneSection:
     male_narrow_radius: float = 4
     """The radius of the narrower part of the male joint."""
 
-    female_offset: float = 0.5
+    female_offset: float = 1
     """The difference between the male and female joins."""
 
-    interior_radius: float = 3
+    interior_radius: float = 2
     """The radius of the interior shaft."""
 
     @property
@@ -108,4 +108,5 @@ class CaneSection:
 if __name__ == "__main__":
     section = CaneSection()
     model = section.get_shape()
+    model = model.union(model.translate(((section.total_radius * 2) + 1, 0, 0)))
     cq.exporters.export(model, "cane_section.stl")
