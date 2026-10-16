@@ -10,7 +10,7 @@ class CaneSection:
     section_length: float = 210
     """The length of the section, minus `join_length`."""
 
-    section_radius: float = 6.5
+    section_radius: float = 7
     """The radius of the main section."""
 
     waist_length: float = 15
@@ -22,13 +22,16 @@ class CaneSection:
     join_length: float = 40
     """The length of each join."""
 
-    male_radius: float = 5.4
-    """The radius of the male joint."""
+    male_wide_radius: float = 6
+    """The radius of the wider part of the male joint."""
 
-    female_radius: float = 5.5
-    """The radius of the female joint."""
+    male_narrow_radius: float = 4
+    """The radius of the narrower part of the male joint."""
 
-    interior_radius: float = 2.5
+    female_offset: float = 0.5
+    """The difference between the male and female joins."""
+
+    interior_radius: float = 3
     """The radius of the interior shaft."""
 
     @property
@@ -37,33 +40,23 @@ class CaneSection:
         return self.join_length + self.section_length
 
     @property
+    def total_radius(self) -> float:
+        """The total radius of the section"""
+        return self.section_radius + self.waist_radius
+
+    @property
     def male_join(self) -> cq.Workplane:
         """The male join.
 
         This join must be translated to be above the main section.
         """
-        difference = self.section_radius - self.male_radius
-        join = cq.Workplane("XY").cylinder(
-            self.join_length, self.male_radius, centered=(True, True, False)
-        )
-        cutter = (
+        return (
             cq.Workplane("XY")
-            .cylinder(
-                difference * 2,
-                self.section_radius * 2,
-                centered=(True, True, False),
-            )
-            .cut(cq.Workplane("XY").cylinder(self.section_length, self.male_radius))
-            .edges("<Z")
-            .fillet(difference)
+            .circle(self.male_wide_radius)
+            .workplane(offset=self.join_length)
+            .circle(self.male_narrow_radius)
+            .loft()
         )
-        ring = (
-            cq.Workplane("XY")
-            .cylinder(difference, self.section_radius, centered=(True, True, False))
-            .cut(cutter)
-        )
-        join = join.union(ring)
-        return join
 
     @property
     def section(self) -> cq.Workplane:
@@ -88,8 +81,12 @@ class CaneSection:
 
         This join should be cut from the base of the section.
         """
-        return cq.Workplane("XY").cylinder(
-            self.join_length, self.female_radius, centered=(True, True, False)
+        return (
+            cq.Workplane("XY")
+            .circle(self.male_wide_radius + self.female_offset)
+            .workplane(offset=self.join_length)
+            .circle(self.male_narrow_radius + self.female_offset)
+            .loft()
         )
 
     @property

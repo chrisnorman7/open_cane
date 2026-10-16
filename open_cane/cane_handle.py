@@ -94,7 +94,7 @@ class CaneHandle:
 
 
 if __name__ == "__main__":
-    section = CaneSection()
+    section = CaneSection(section_length=100)
     handle = CaneHandle(section=section)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
