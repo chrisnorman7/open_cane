@@ -8,6 +8,7 @@ from braille import (
     multiline_braille,
 )
 from cane_handle import CaneHandle
+from cane_joint import CaneJoint
 from cane_section import CaneSection
 from cane_tip import CaneTip
 
@@ -22,4 +23,5 @@ __all__ = [
     "multiline_braille",
     "CaneHandle",
     "CaneTip",
+    "CaneJoint",
 ]
