@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
 import cadquery as cq
-
-from open_cane.cane_joint import CaneJoint
+from cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)
@@ -15,10 +14,7 @@ class CaneTip:
     joint_length: float = 40
     """The length of the female joint."""
 
-    walls_thickness: float = 3
-    """The thickness of the walls."""
-
-    string_hole_radius: float = 5
+    string_hole_radius: float = 2.5
     """The radius for the top hole which the string will pass through."""
 
     ball_height: float = 25
@@ -35,34 +31,33 @@ class CaneTip:
         """The ball part of the cane."""
         return (
             cq.Workplane("XY")
-            .cylinder(self.ball_height, self.ball_radius)
-            .edges("Z")
+            .cylinder(self.ball_height, self.ball_radius, centered=(True, True, False))
+            .edges("<Z or >Z")
             .fillet(self.ball_fillet)
         )
 
     @property
-    def stem_length(self) -> float:
-        """The length of the tip stem."""
-        return self.joint_length / 1.5
-
-    @property
     def stem(self) -> cq.Workplane:
         """The stem of the tip."""
-        stem_length = self.stem_length
-        return (
+        half = self.joint_length / 2
+        top = (
             cq.Workplane("XY")
             .cylinder(
-                stem_length,
-                self.joint_radius - self.string_hole_radius,
+                half,
+                self.joint_radius - self.string_hole_radius / 2,
                 centered=(True, True, False),
             )
             .cut(
                 cq.Workplane("XY")
                 .cylinder(self.joint_radius * 2, self.string_hole_radius)
                 .rotate((0, 0, 0), (0, 1, 0), 90)
-                .translate((0, 0, stem_length / 2))
+                .translate((0, 0, half / 2))
             )
+        ).translate((0, 0, half))
+        bottom = cq.Workplane("XY").cylinder(
+            half, self.joint_radius, centered=(True, True, False)
         )
+        return bottom.union(top)
 
     def get_shape(self) -> cq.Workplane:
         """Get the entire tip."""
