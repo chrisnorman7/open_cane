@@ -1,23 +1,22 @@
 from dataclasses import dataclass
-from typing import cast
 
 import cadquery as cq
 from braille import BrailleLine
-from cane_section import CaneSection
+
+from open_cane.cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)
 class CaneHandle:
     """The handle of the cane."""
 
-    section: CaneSection
-    """The section this handle will be attached to.
+    joint_radius: float
+    """The radius of the female joint."""
 
-    The section settings are used to work out the length and radius of the handle.
-    """
-
-    radius_overflow: float = 0
-    """How much space should be left between the outside of the section and the handle."""
+    joint_length: float = 40
+    """The length of the female join."""
+    handle_length: float = 190
+    """The length of the handle."""
 
     top_thickness: float = 20
     """How much material will make up the top of the handle."""
@@ -25,7 +24,7 @@ class CaneHandle:
     walls_thickness: float = 3
     """The thickness of the walls."""
 
-    hole_radius: float = 1.5
+    string_hole_radius: float = 5
     """The radius for the top hole which the string will pass through."""
 
     braille_text: str | None = "⠠⠕⠏⠢⠀⠠⠉⠁⠝⠑"
@@ -41,9 +40,8 @@ class CaneHandle:
 
     def get_shape(self) -> cq.Workplane:
         """Get the shape of the handle."""
-        section = self.section
-        height = section.section_length - section.waist_length + self.top_thickness
-        cross_section = self.walls_thickness + section.section_radius
+        height = self.handle_length + self.joint_length + self.top_thickness
+        cross_section = self.walls_thickness + self.joint_radius
         box_y = cross_section * 2
         cylinder = cq.Workplane("XY").cylinder(
             height, cross_section, centered=(True, True, False)
@@ -74,19 +72,16 @@ class CaneHandle:
                 )
             )
             cylinder = cylinder.union(braille)
-            shape = cast(cq.Shape, cylinder.val())
-            box = shape.BoundingBox()
-            print(box.xmin)
         middle = (
             cq.Workplane("XY")
             .cylinder(
-                height - self.top_thickness,
-                section.section_radius + self.radius_overflow,
+                self.joint_length,
+                self.joint_length,
                 centered=(True, True, False),
             )
             .union(
                 cq.Workplane("XY").cylinder(
-                    height, self.hole_radius, centered=(True, True, False)
+                    height, self.string_hole_radius, centered=(True, True, False)
                 )
             )
         )
@@ -94,7 +89,7 @@ class CaneHandle:
 
 
 if __name__ == "__main__":
-    section = CaneSection(section_length=100)
-    handle = CaneHandle(section=section)
+    joint = CaneJoint()
+    handle = CaneHandle(joint.tube_radius, joint_length=joint.female_length)
     model = handle.get_shape()
     cq.exporters.export(model, "handle.stl")
