@@ -1,4 +1,4 @@
-from braille import (
+from .braille import (
     BrailleDots,
     BrailleLine,
     BrailleSettings,
@@ -7,10 +7,10 @@ from braille import (
     is_braille_character,
     multiline_braille,
 )
-from cane_handle import CaneHandle
-from cane_joint import CaneJoint
-from cane_section import CaneSection
-from cane_tip import CaneTip
+from .cane_handle import CaneHandle
+from .cane_joint import CaneJoint
+from .cane_section import CaneSection
+from .cane_tip import CaneTip
 
 __all__ = [
     "CaneSection",

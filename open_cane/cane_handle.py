@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
 import cadquery as cq
-from braille import BrailleLine
 
-from open_cane.cane_joint import CaneJoint
+from .braille import BrailleLine
+from .cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)

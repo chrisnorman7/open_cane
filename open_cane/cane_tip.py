@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 import cadquery as cq
-from cane_joint import CaneJoint
+
+from .cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)
