@@ -1,15 +1,25 @@
 from dataclasses import dataclass
 
 import cadquery as cq
-from cane_section import CaneSection
+
+from open_cane.cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)
 class CaneTip:
     """The tip of the cane."""
 
-    section: CaneSection
-    """The section to size the tip to."""
+    joint_radius: float
+    """The radius of the female joint."""
+
+    joint_length: float = 40
+    """The length of the female joint."""
+
+    walls_thickness: float = 3
+    """The thickness of the walls."""
+
+    string_hole_radius: float = 5
+    """The radius for the top hole which the string will pass through."""
 
     ball_height: float = 25
     """The height of the ball part."""
@@ -19,9 +29,6 @@ class CaneTip:
 
     ball_fillet: float = 4
     """The fillet to use for the top and bottom edges."""
-
-    interior_offset: float = 0.1
-    """The difference between the interior radius of the section and the stem of the tip."""
 
     @property
     def ball(self) -> cq.Workplane:
@@ -36,73 +43,34 @@ class CaneTip:
     @property
     def stem_length(self) -> float:
         """The length of the tip stem."""
-        return self.section.join_length / 1.5
+        return self.joint_length / 1.5
 
     @property
     def stem(self) -> cq.Workplane:
         """The stem of the tip."""
-        section = self.section
-        middle_cutter = cq.Workplane("XY").box(
-            section.section_radius * 2,
-            section.interior_radius,
-            section.join_length,
-            centered=(True, True, False),
-        )
-        loop = (
+        stem_length = self.stem_length
+        return (
             cq.Workplane("XY")
-            .box(
-                section.interior_radius,
-                section.interior_radius,
-                self.stem_length,
+            .cylinder(
+                stem_length,
+                self.joint_radius - self.string_hole_radius,
                 centered=(True, True, False),
             )
             .cut(
                 cq.Workplane("XY")
-                .cylinder(section.section_length, section.interior_radius)
+                .cylinder(self.joint_radius * 2, self.string_hole_radius)
                 .rotate((0, 0, 0), (0, 1, 0), 90)
+                .translate((0, 0, stem_length / 2))
             )
         )
-        return (
-            cq.Workplane("XY")
-            .cylinder(
-                self.stem_length,
-                section.female_radius - self.interior_offset,
-                centered=(True, True, False),
-            )
-            .cut(middle_cutter)
-        ).union(loop)
 
     def get_shape(self) -> cq.Workplane:
         """Get the entire tip."""
-        section = self.section
-        difference = self.ball_radius - self.ball_fillet
-        cutter = (
-            cq.Workplane("XY")
-            .cylinder(
-                section.section_length,
-                section.section_radius * 2,
-                centered=(True, True, False),
-            )
-            .cut(
-                cq.Workplane("XY").cylinder(
-                    section.section_length, section.female_radius - self.interior_offset
-                )
-            )
-            .edges("<Z")
-            .fillet(difference)
-        )
-        ring = (
-            cq.Workplane("XY")
-            .cylinder(difference, difference, centered=(True, True, False))
-            .cut(cutter)
-        )
-        return ring.union(
-            self.ball.union(self.stem.translate((0, 0, self.ball_height)))
-        )
+        return self.ball.union(self.stem.translate((0, 0, self.ball_height)))
 
 
 if __name__ == "__main__":
-    section = CaneSection()
-    tip = CaneTip(section)
+    joint = CaneJoint()
+    tip = CaneTip(joint.tube_radius)
     model = tip.get_shape()
     cq.exporters.export(model, "tip.stl")
