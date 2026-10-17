@@ -7,7 +7,7 @@ import cadquery as cq
 class CaneJoint:
     """A joint between two metal tubes."""
 
-    tube_radius: float = 6.2
+    tube_radius: float = 7
     """The radius of the metal tube, plus some.
 
     For example, with 13 mm tubes, the radius is `6.5`. Then add a little for wiggle room.
@@ -30,8 +30,11 @@ class CaneJoint:
     male_join_length: float = 40
     """The length of the part which will clamp the tube."""
 
-    male_offset: float = 0.1
+    male_offset: float = 0.2
     """The offset from `tube_radius` which will inform the radius of the part of the join which grips the tube."""
+
+    fillet: float = 1
+    """The fillet for the two ends."""
 
     @property
     def full_length(self) -> float:
@@ -91,7 +94,7 @@ class CaneJoint:
         cylinder = cylinder.cut(string_hole.translate((0, 0, self.male_join_length)))
         male_section = self.male_section
         cylinder = cylinder.cut(male_section)
-        return cylinder
+        return cylinder.edges("<Z or >Z").fillet(self.fillet)
 
 
 if __name__ == "__main__":
