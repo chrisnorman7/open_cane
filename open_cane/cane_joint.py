@@ -18,7 +18,7 @@ class CaneJoint:
     wall_thickness: float = 3
     """The thickness of the walls."""
 
-    female_length: float = 30
+    female_length: float = 40
     """The length of the female part of the joint."""
 
     string_hole_length: float = 5
