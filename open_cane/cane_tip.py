@@ -2,8 +2,6 @@ from dataclasses import dataclass
 
 import cadquery as cq
 
-from .cane_joint import CaneJoint
-
 
 @dataclass(frozen=True)
 class CaneTip:
@@ -63,10 +61,3 @@ class CaneTip:
     def get_shape(self) -> cq.Workplane:
         """Get the entire tip."""
         return self.ball.union(self.stem.translate((0, 0, self.ball_height)))
-
-
-if __name__ == "__main__":
-    joint = CaneJoint()
-    tip = CaneTip(joint.tube_radius)
-    model = tip.get_shape()
-    cq.exporters.export(model, "tip.stl")

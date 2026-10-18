@@ -95,8 +95,3 @@ class CaneJoint:
         male_section = self.male_section
         cylinder = cylinder.cut(male_section)
         return cylinder.edges("<Z or >Z").fillet(self.fillet)
-
-
-if __name__ == "__main__":
-    joint = CaneJoint()
-    joint.get_shape().export("joint.step")

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import cadquery as cq
 
 from .braille import BrailleLine
-from .cane_joint import CaneJoint
 
 
 @dataclass(frozen=True)
@@ -87,10 +86,3 @@ class CaneHandle:
             )
         )
         return cylinder.cut(middle)
-
-
-if __name__ == "__main__":
-    joint = CaneJoint()
-    handle = CaneHandle(joint.tube_radius, joint_length=joint.female_length)
-    model = handle.get_shape()
-    cq.exporters.export(model, "handle.stl")
