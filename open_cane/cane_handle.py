@@ -76,7 +76,7 @@ class CaneHandle:
             cq.Workplane("XY")
             .cylinder(
                 self.joint_length,
-                self.joint_length,
+                self.joint_radius,
                 centered=(True, True, False),
             )
             .union(
