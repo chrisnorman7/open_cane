@@ -16,6 +16,9 @@ class CaneTip:
     string_hole_radius: float = 2.5
     """The radius for the top hole which the string will pass through."""
 
+    stem_difference: float = 2
+    """How much to subtract from `joint_radius` when making the stem."""
+
     ball_height: float = 25
     """The height of the ball part."""
 
@@ -43,7 +46,7 @@ class CaneTip:
             cq.Workplane("XY")
             .cylinder(
                 half,
-                self.joint_radius - self.string_hole_radius / 2,
+                self.joint_radius - self.stem_difference,
                 centered=(True, True, False),
             )
             .cut(
